@@ -1,0 +1,180 @@
+//Arseniy Zolotarev
+using System;
+using System.Collections.Generic;
+
+namespace DomaciUloha3
+{
+    static class Prevod
+    {
+        private static int translatedNumber;
+
+        public static int TranslatedNumber
+        {
+            get { return translatedNumber; }
+            set { translatedNumber = value; }
+        }
+
+        private static int systemFrom;
+
+        public static int SystemFrom
+        {
+            set
+            {
+                if (value >= 2 && value <= 10)
+                {
+                    systemFrom = value;
+                }
+                else
+                {
+                    systemFrom = 10;
+                    Console.WriteLine($"Cislo {value} neni mezi 2 a 10, proto nastavena defaultni soustava 10");
+                }
+            }
+        }
+
+        private static int systemTo;
+
+        public static int SystemTo
+        {
+            set
+            {
+                if (value >= 2 && value <= 10)
+                {
+                    systemTo = value;
+                }
+                else
+                {
+                    systemTo = 2;
+                    Console.WriteLine($"Cislo {value} neni mezi 2 a 10, proto nastavena defaultni soustava 2");
+                }
+            }
+        }
+
+        private static int ConvertToDecimal()
+        {
+            var number = translatedNumber;
+            var decimalNumber = 0;
+            for (int i = 0; number != 0; i++)
+            {
+                decimalNumber += (number % 10) * (int)Math.Pow(systemFrom, i);
+                number /= 10;
+            }
+
+            return decimalNumber;
+        }
+
+        private static string ConvertToResult()
+        {
+            var decimalNumber = ConvertToDecimal();
+            List<int> result = new List<int>();
+
+            while (decimalNumber > 0)
+            {
+                result.Add(decimalNumber % systemTo);
+                decimalNumber /= systemTo;
+            }
+
+            result.Reverse();
+
+            return string.Join("", result);
+        }
+
+        private static bool CheckСompatibility()
+        {
+            var num = translatedNumber;
+            while (num != 0)
+            {
+                if (num % 10 >= systemFrom)
+                {
+                    return false;
+                }
+                num /= 10;
+            }
+
+            return true;
+        }
+
+        public static void PrintResult()
+        {
+            if (systemFrom == 0 && systemTo == 0)
+            {
+                Console.WriteLine("Zadejte prosim cisla");
+            }
+            else if (CheckСompatibility())
+            {
+                var result = ConvertToResult();
+                Console.WriteLine($"Cislo {translatedNumber} " +
+                                  $"v soustave {systemFrom} " +
+                                  $"prevedene do soustavy {systemTo} " +
+                                  $"je: {result}");
+            }
+            else
+            {
+                Console.WriteLine($"Cislo {translatedNumber} neni v soustave {systemFrom} platne.");
+            }
+            Console.WriteLine("\nPokracujte stisknutim libovolneho tlacitka");
+            Console.ReadKey();
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            var menuOn = true;
+            while (menuOn)
+            {
+                PrintMenu();
+                switch (Console.ReadKey(true).KeyChar)
+                {
+                    case '1':
+                        GetNumbers();
+                        break;
+                    case '2':
+                        Prevod.PrintResult();
+                        break;
+                    case '3':
+                        menuOn = false;
+                        break;
+                }
+            }
+        }
+
+        static void PrintMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Prevod cisel z a do ruznych soustav\n" +
+                              "Volby:\n" +
+                              "[1] Zadani cisla a soustav\n" +
+                              "[2] Prevod cisla\n" +
+                              "[3] Konec programu");
+        }
+
+        static int CheckInputData(int defaultNumber)
+        {
+            var usersInput = Console.ReadLine();
+            if (int.TryParse(usersInput, out int usersNumber))
+            {
+                return usersNumber;
+            }
+            else
+            {
+                Console.WriteLine($"{usersInput} - neni cislo, proto nastaveno defaulni cislo {defaultNumber}");
+                return defaultNumber;
+            }
+        }
+
+        static void GetNumbers()
+        {
+            Console.Write("Zadej predvadene cislo: ");
+            Prevod.TranslatedNumber = CheckInputData(123456789);
+            Console.Write("Zadej soustavy, ze ktere prevadis: ");
+            Prevod.SystemFrom = CheckInputData(10);
+            Console.Write("Zadej soustavy, do ktere prevadis: ");
+            Prevod.SystemTo = CheckInputData(2);
+            Console.WriteLine("Cisla uspesne nacteny.\n\n" +
+                              "Pokracujte stisknutim libovolneho tlacitka");
+            Console.ReadKey();
+        }
+    }
+}
